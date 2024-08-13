@@ -11,6 +11,14 @@ if ! command_exists jupyter; then
     exit 1
 fi
 
+# Optionally check if black is installed
+if ! command_exists black; then
+    echo "Warning: black is not installed. The script will run without formatting."
+    use_black=false
+else
+    use_black=true
+fi
+
 # Check if at least one notebook file is provided
 if [ "$#" -eq 0 ]; then
     echo "Usage: $0 <notebook1.ipynb> [notebook2.ipynb ...]"
@@ -54,5 +62,10 @@ for notebook in "$@"; do
     # Replace the original file with the cleaned file
     mv "${py_file}.tmp" "$py_file"
 
-    echo "Cleaned Python script generated: ${py_file}"
+    # Optionally format the cleaned Python script with black
+    if [ "$use_black" = true ]; then
+        black "$py_file"
+    fi
+
+    echo "Cleaned and formatted Python script generated: ${py_file}"
 done
